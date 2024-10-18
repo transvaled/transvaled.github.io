@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Formulário</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="email"], input[type="password"], select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Formulário de Cadastro</h1>
+    <form id="registrationForm">
+        <label for="name">Nome Completo:</label>
+        <input type="text" id="name" name="name" placeholder="Seu nome completo">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="seuemail@dominio.com">
+
+        <label for="age">Idade:</label>
+        <input type="text" id="age" name="age" placeholder="Sua idade">
+
+        <label for="password">Senha:</label>
+        <input type="password" id="password" name="password" placeholder="Crie uma senha">
+
+        <label for="gender">Gênero:</label>
+        <select id="gender" name="gender">
+            <option value="">Selecione</option>
+            <option value="male">Masculino</option>
+            <option value="female">Feminino</option>
+            <option value="other">Outro</option>
+        </select>
+
+        <button type="submit" id="submitBtn">Cadastrar</button>
+        <p id="errorMessage" class="error" style="display: none;">Por favor, preencha todos os campos corretamente.</p>
+    </form>
+
+    <!-- Tabela para exibir os dados -->
+    <table id="userTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Idade</th>
+                <th>Gênero</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        // Função para carregar os dados do cache e exibi-los na tabela
+        function loadTableData() {
+            const userTable = document.getElementById('userTable');
+            const tbody = userTable.querySelector('tbody');
+            tbody.innerHTML = ''; // Limpa a tabela antes de carregar
+
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            
+            if (users.length > 0) {
+                userTable.style.display = 'table'; // Exibe a tabela se houver dados
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.email}</td>
+                        <td>${user.name}</td>
+                        <td>${user.age}</td>
+                        <td>${user.gender}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                userTable.style.display = 'none'; // Esconde a tabela se não houver dados
+            }
+        }
+
+        // Função de validação e salvamento
+        document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const age = document.getElementById('age').value;
+            const password = document.getElementById('password').value;
+            const gender = document.getElementById('gender').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            if (!name || !email || !age || !password || !gender) {
+                errorMessage.style.display = 'block';
+            } else {
+                errorMessage.style.display = 'none';
+
+                // Salvar os dados no localStorage (troca o nome pelo email e vice-versa)
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                users.push({ name, email, age, gender });
+                localStorage.setItem('users', JSON.stringify(users));
+
+                // Limpar o formulário
+                document.getElementById('registrationForm').reset();
+
+                // Atualizar a tabela com os dados
+                loadTableData();
+            }
+        });
+
+        // Carregar os dados ao iniciar a página
+        loadTableData();
+    </script>
+
+</body>
+</html>
